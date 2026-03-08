@@ -1,49 +1,53 @@
-import { useState } from "react";
-import Editor from "@monaco-editor/react";
+import {useState} from "react"
+import CodeEditor from "../components/CodeEditor"
+import ResultPanel from "../components/ResultPanel"
+import Navbar from "../components/Navbar"
+import {reviewCode} from "../utils/api"
 
 export default function Dashboard(){
 
 const [code,setCode] = useState("")
 const [result,setResult] = useState("")
 
-const review = async ()=>{
+const runReview = async()=>{
 
-const res = await fetch("http://localhost:8000/review",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({code})
-})
+const data = await reviewCode(code)
 
-const data = await res.json()
 setResult(data.review)
 
 }
 
 return(
 
-<div className="flex h-screen">
+<div className="h-screen flex flex-col bg-black">
 
-<div className="w-1/2">
-<Editor
-height="100%"
-defaultLanguage="javascript"
-theme="vs-dark"
-onChange={(v)=>setCode(v)}
-/>
+<Navbar/>
 
-<button onClick={review}>
+<div className="flex flex-1">
+
+<div className="w-1/2 relative">
+
+<CodeEditor code={code} setCode={setCode}/>
+
+<button
+onClick={runReview}
+className="absolute bottom-6 right-6 bg-green-600 px-6 py-3 rounded"
+>
+
 AI Review
+
 </button>
 
 </div>
 
-<div className="w-1/2 p-6 bg-black text-white">
-<pre>{result}</pre>
+<div className="w-1/2">
+<ResultPanel result={result}/>
+</div>
+
 </div>
 
 </div>
 
 )
+
 }
